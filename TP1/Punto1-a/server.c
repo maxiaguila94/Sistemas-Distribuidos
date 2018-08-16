@@ -48,20 +48,22 @@ int main(int argc, char *argv[])
      if (n < 0) error("ERROR reading from socket");
      printf("Here is the message: %s\n",buffer);
      
-    int buffer_tokens[256]; 
+    int buffer_tokens[256];
     int i=0;
+
     for (char *token = strtok(buffer," "); token != NULL ; token = strtok(NULL, " ")){
         buffer_tokens[i++]=atoi(token); // convierto el token a integer
     }
+    /*
     for (i=0; i<=sizeof(buffer_tokens); i++){
         printf("%d",buffer_tokens[i]);
     }
-
+    */
     int resultado=0;
     int cant_tokens=i;
 
     for (i=0; i<=cant_tokens; i++){
-        resultado=resultado + buffer_tokens[i];
+        resultado=resultado + buffer_tokens[i]; // Realiza la suma de los tokens
     }
     printf("El resultado es:%d",resultado);
     

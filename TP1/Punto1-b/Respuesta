@@ -1,0 +1,12 @@
+El formato de la llamada a sistema de escritura es:
+ssize_t write(int fd, const void *buf, size_t count);
+
+En caso de éxito, se devuelve el número de bytes escritos (el cero indica que no se ha escrito nada). En caso de error, se devuelve -1 y errnose establece de forma adecuada.
+
+Sin embargo, no dice cuál es el límite del parámetro de conteo. Todavía no dice el comportamiento cuando el recuento es mayor que SSIZE_MAX.
+
+Teniendo en cuenta que escribir es una llamada al sistema que se puede usar para dispositivos / archivos genéricos / lo que sea, si el dispositivo admite operaciones de escritura mayores que SSIZE_MAX, el tipo de devolución no puede manejar la cantidad real de bytes escritos.
+
+Estos resultados son consecuencia de que la cantidad de bytes leidas y devueltas
+(de tipo ssize_t) superan el máximo preestablecido indicando en la constante
+SSIZE_MAX.
