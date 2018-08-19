@@ -8,6 +8,7 @@
 #include <netinet/in.h>
 #include <string.h>
 #include <unistd.h>
+#include <ctype.h>
 
 void error(char *msg)
 {
@@ -17,32 +18,53 @@ void error(char *msg)
 
 int main(int argc, char *argv[])
 {
+    
+    /*
+    sockfd: file descriptor del socket del server
+    newsockfd: file descriptor del socket para un cliente
+    portno: puerto de servicio
+    clien: variable cliente
+    
+    */
      int sockfd, newsockfd, portno, clilen;
+
      char buffer[256];
      struct sockaddr_in serv_addr, cli_addr;
      int n;
+
      if (argc < 2) {
          fprintf(stderr,"ERROR, no port provided\n");
          exit(1);
      }
-     sockfd = socket(AF_INET, SOCK_STREAM, 0);
-     if (sockfd < 0) 
+    
+    // creamos el socket
+     if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) 
         error("ERROR opening socket");
+    //  inicializacion de la estructura serv_addr
      bzero((char *) &serv_addr, sizeof(serv_addr));
+     
+    //  puerto
      portno = atoi(argv[1]);
+
      serv_addr.sin_family = AF_INET;
      serv_addr.sin_addr.s_addr = INADDR_ANY;
      serv_addr.sin_port = htons(portno);
+     
      if (bind(sockfd, (struct sockaddr *) &serv_addr,
               sizeof(serv_addr)) < 0) 
               error("ERROR on binding");
+     
      listen(sockfd,5);
+     
      clilen = sizeof(cli_addr);
+     
      newsockfd = accept(sockfd, 
                  (struct sockaddr *) &cli_addr, 
                  &clilen);
+     
      if (newsockfd < 0) 
           error("ERROR on accept");
+
      bzero(buffer,256);
      n = read(newsockfd,buffer,255);
      if (n < 0) error("ERROR reading from socket");
@@ -50,6 +72,8 @@ int main(int argc, char *argv[])
      
     int buffer_tokens[256];
     int i=0;
+
+    bzero(buffer_tokens,256);
 
     for (char *token = strtok(buffer," "); token != NULL ; token = strtok(NULL, " ")){
         buffer_tokens[i++]=atoi(token); // convierto el token a integer
@@ -61,13 +85,15 @@ int main(int argc, char *argv[])
     */
     int resultado=0;
     int cant_tokens=i;
-
+    char response[256];
+    
     for (i=0; i<=cant_tokens; i++){
         resultado=resultado + buffer_tokens[i]; // Realiza la suma de los tokens
     }
     printf("El resultado es:%d",resultado);
-    
-     n = write(newsockfd,&resultado,sizeof(int));
+    sprintf(response, "%d", resultado);
+
+     n = write(newsockfd, &response, sizeof(response));
      if (n < 0) error("ERROR writing to socket");
      return 0; 
 }
