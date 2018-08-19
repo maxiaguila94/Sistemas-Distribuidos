@@ -1,5 +1,7 @@
-2-a) Un servidor con estados es aquel que va manteniendo información (estados) sobre las diferentes operaciones que ha realizado (sesiones). El resguardo de estos
+2-a-1) Un servidor con estados es aquel que va manteniendo información (estados) sobre las diferentes operaciones que ha realizado (sesiones). El resguardo de estos
 estados permite que el cliente tenga que transmitir menor cantidad de información puesto que no debe reiterar aquellos datos no variantes (numero de file sistem por ejemplo). Los estados guardados en
 un servidor con estados deben ser actualizada conforme estos varían.
 Por otro lado un servidor sin estados es aquel que no mantiene información sobre las actividades que fueron realizando. De este modo, por cada operación, el cliente debe volver a brindar los datos que son necesarios, provocando
 mayor tráfico de datos y sin tener un "historial" de las sesiones u operaciones realizadas anteriormente.
+
+2-a-2) 
