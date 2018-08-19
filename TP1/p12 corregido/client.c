@@ -12,50 +12,63 @@
 int s;	//nro de socket
 
 static void leer(char *from, int binicio, int cbytes )    // char *to, 
-	{
+{
 	RD rd;
 	FILE *f;
-	int qty,c_restantes,p_actual;
+	int qty = -1,c_restantes,p_actual;
 	char buffer[ LARGOBUF ], *to;
-	to = "alfa.pdf";   //defino destino local de datos
+	to = "alfa.txt";   //defino destino local de datos
 
 	printf( "transfiriendo %s remoto al %s local\n", from, to );
 	//Aperturas
 	rd = rmtopen( s, O_RDONLY, from);
-	if (rd >= 0) {
-	  printf( "Abrió el remoto: %d\n", rd );
-	  f = fopen( to, "w" );
-	  if( f == NULL || rd < 0 )  //Hay error en aperturas
+	
+	if (rd >= 0) 
+	{
+		printf( "Abrió el remoto: %d\n", rd );
+	
+		f = fopen( to, "w" );
+		if( f == NULL || rd < 0 )  //Hay error en aperturas
 		{
-		perror( "leer" );
-		exit(1);
-	  }
+			perror( "leer" );
+			exit(1);	
+		}
 
-	  //Determinar bytes a leer
-	  c_restantes = cbytes;
-	  p_actual = binicio;
-	  while (c_restantes > 0 && qty != 0) {
-	    if (c_restantes < sizeof( buffer ))
-		  qty = c_restantes;
-	    else
-		  qty = sizeof( buffer ); 
-	    qty = rmtread( s, rd, buffer, qty, p_actual);
-	    fwrite( buffer, 1, qty, f );
-	    c_restantes -= qty;
-	    p_actual +=qty;
-	  }
-	  printf( "Cerrando el remoto %d\n", rmtclose( s, rd ) );
-	  fclose( f );
-	}
+	  	//Determinar bytes a leer
+		c_restantes = cbytes;
+		p_actual = binicio;
+		printf("Antes del while\n");
+		while (c_restantes > 0 && qty != 0) 
+		{
+		
+			if (c_restantes < sizeof( buffer ))
+				qty = c_restantes;
+			else
+				qty = sizeof( buffer ); 
+			
+			qty = rmtread( s, rd, buffer, qty, p_actual);
+			printf("Valor del buffer %s", buffer);
+			fwrite( buffer, 1, qty, f );
+
+			c_restantes -= qty;
+			p_actual +=qty;
+		
+		}
+		
+		printf("Despues del while\n");
+		printf( "Cerrando el remoto %d\n", rmtclose( s, rd ) );
+		fclose( f );
+	
+	} 
 	else
 	  printf( "Lo siento..!! No pudo abrirse el %s remoto.\n", to );
 }
 
 static void escribir( const char *to,  int cbytes)
-	{
+{
 	RD rd;
 	FILE *f;
-	int qty,c_restantes,p_actual;
+	int qty = -1,c_restantes,p_actual;
 	char buffer[ LARGOBUF ], *from;
 	from =  "beta.txt";   //defino origen local de datos
 
@@ -75,15 +88,19 @@ static void escribir( const char *to,  int cbytes)
 	  desde el inicio del file.*/ 
 	  c_restantes = cbytes;
 	  p_actual = 0;
+
 	  while (c_restantes > 0 && qty != 0) {
-	    if (c_restantes < sizeof( buffer ))
-		  qty = c_restantes;
+	    
+			if (c_restantes < sizeof( buffer ))
+		  	qty = c_restantes;
 	    else
-		  qty = sizeof( buffer ); 
-	    fseek(f, p_actual, SEEK_SET);
+		  	qty = sizeof( buffer ); 
+	    
+			fseek(f, p_actual, SEEK_SET);
 	    qty = fread( buffer, 1, qty, f );
 	    rmtwrite( s, rd, buffer, qty );	    
-	    c_restantes -= qty;
+	    
+			c_restantes -= qty;
 	    p_actual +=qty;
 
 	  }
@@ -92,7 +109,7 @@ static void escribir( const char *to,  int cbytes)
 	  }
 	else
 	  printf( "Lo siento..!! No pudo abrirse el %s remoto.\n", to );
-	}
+}
 
 void main( void )
     {
@@ -101,38 +118,38 @@ void main( void )
     char byteinicial[9], cantidadbytes[9];
 
     //int  largo;
-    s = sockcl_init( "localhost" , "8888" ); 
+    s = sockcl_init( "10.42.0.162" , "8888" ); 
     if (s < 0) {
 	    fprintf(stderr,"No abrió el Socket\n");
 	    exit(0);
     }
 
     for (;;)
-	{
-	printf("Escriba Comando (leer/escribir): ");
-	bzero(orden,20);  
-	fgets(orden,20,stdin);
+		{
+			printf("Escriba Comando (leer/escribir): ");
+			bzero(orden,20);  
+			fgets(orden,20,stdin);
 
-	printf("Escriba Nombre de Archivo a leer/escribir (/path/archivo): ");
-	bzero(temp,50);  
-	fgets(nombrearchivo,50,stdin);
-	strncpy(temp, nombrearchivo, strlen(nombrearchivo) - 1);
-	strcpy(nombrearchivo, temp);
+			printf("Escriba Nombre de Archivo a leer/escribir (/path/archivo): ");
+			bzero(temp,50);  
+			fgets(nombrearchivo,50,stdin);
+			strncpy(temp, nombrearchivo, strlen(nombrearchivo) - 1);
+			strcpy(nombrearchivo, temp);
 
-	printf("Escriba cantidad de bytes a transferir (1 a 7 cifras): ");
-	fgets(cantidadbytes,9,stdin);
-	
-	if (orden[0] == 'l' || orden[0] == 'L')
-	  {
-	  printf("Escriba byte de inicio del Origen (1 a 7 cifras): ");
-	  fgets(byteinicial,9,stdin);
+			printf("Escriba cantidad de bytes a transferir (1 a 7 cifras): ");
+			fgets(cantidadbytes,9,stdin);
+			
+			if (orden[0] == 'l' || orden[0] == 'L')
+				{
+				printf("Escriba byte de inicio del Origen (1 a 7 cifras): ");
+				fgets(byteinicial,9,stdin);
 
-	  //Llamo la lectura. El buffer es local a la función
-	  leer(nombrearchivo, atoi(byteinicial), atoi(cantidadbytes)); 
-	  }
-	else
-	    //Llamo la escritura. El buffer es local a la función
-	    escribir(nombrearchivo,  atoi(cantidadbytes));
-	}
-    }
+				//Llamo la lectura. El buffer es local a la función
+				leer(nombrearchivo, atoi(byteinicial), atoi(cantidadbytes)); 
+				}
+			else
+					//Llamo la escritura. El buffer es local a la función
+					escribir(nombrearchivo,  atoi(cantidadbytes));
+		}
+  }
 
