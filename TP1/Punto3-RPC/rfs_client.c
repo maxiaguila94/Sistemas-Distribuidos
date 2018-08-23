@@ -53,7 +53,7 @@ rfs_1(char *host, char *file_name,  int opcion)
 	{
 		// RFS READ
 		rfs_read_1_arg.fd = fd;
-		rfs_read_1_arg.count = 20;
+		rfs_read_1_arg.count = 1024;
 
 		do {
 			result_2 = rfs_read_1(&rfs_read_1_arg, clnt);
@@ -62,7 +62,7 @@ rfs_1(char *host, char *file_name,  int opcion)
 			}
 			for (n=0; n < result_2->file_data_len; ++n)
 				putchar(result_2->file_data_val[n]);
-		} while (result_2->file_data_len == 20);
+		} while (result_2->file_data_len == rfs_read_1_arg.count);
 		putchar('\n');
 	} else {
 		// RFS WRITE
