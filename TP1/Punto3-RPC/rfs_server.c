@@ -14,7 +14,6 @@ rfs_open_1_svc(open_record *argp, struct svc_req *rqstp)
 	/*
 	 * insert server code here
 	 */
-	printf("Estoy en el OPEN");
 
 	return &result;
 }
@@ -27,7 +26,6 @@ rfs_read_1_svc(read_record *argp, struct svc_req *rqstp)
 	/*
 	 * insert server code here
 	 */
-	printf("Estoy en el READ");
 
 	return &result;
 }
@@ -40,7 +38,6 @@ rfs_write_1_svc(write_record *argp, struct svc_req *rqstp)
 	/*
 	 * insert server code here
 	 */
-	printf("Estoy en el WRITE");
 
 	return &result;
 }
@@ -53,7 +50,6 @@ rfs_close_1_svc(int *argp, struct svc_req *rqstp)
 	/*
 	 * insert server code here
 	 */
-	printf("Estoy en el CLOSE");
 
 	return &result;
 }

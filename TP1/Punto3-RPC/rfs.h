@@ -34,7 +34,7 @@ typedef struct read_record read_record;
 struct write_record {
 	int fd;
 	int count;
-	char buffer[256];
+	char *buffer;
 };
 typedef struct write_record write_record;
 

@@ -44,13 +44,11 @@ xdr_write_record (XDR *xdrs, write_record *objp)
 {
 	register int32_t *buf;
 
-	int i;
 	 if (!xdr_int (xdrs, &objp->fd))
 		 return FALSE;
 	 if (!xdr_int (xdrs, &objp->count))
 		 return FALSE;
-	 if (!xdr_vector (xdrs, (char *)objp->buffer, 256,
-		sizeof (char), (xdrproc_t) xdr_char))
+	 if (!xdr_string (xdrs, &objp->buffer, ~0))
 		 return FALSE;
 	return TRUE;
 }
