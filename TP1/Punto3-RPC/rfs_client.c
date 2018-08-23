@@ -69,7 +69,7 @@ rfs_1(char *host, char *file_name,  int opcion)
 		result_3 = rfs_write_1(&rfs_write_1_arg, clnt);
 		if (result_3 == (file_data *) NULL) {
 			clnt_perror (clnt, "call failed");
-		}
+		}z
 	} 
 
 	result_4 = rfs_close_1(&rfs_close_1_arg, clnt);
