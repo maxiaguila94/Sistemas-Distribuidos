@@ -28,6 +28,9 @@ rfs_1(char *host, char *file_name,  int opcion)
 	int  *result_4;
 	int  rfs_close_1_arg;
 	int fd, n;
+	const int MAX_BUFFER = 1024;
+	FILE *lfd;
+
 
 #ifndef	DEBUG
 	clnt = clnt_create (host, RFS, RFS_VERS_1, "udp");
@@ -66,15 +69,20 @@ rfs_1(char *host, char *file_name,  int opcion)
 		putchar('\n');
 	} else {
 		// RFS WRITE
-		result_3 = rfs_write_1(&rfs_write_1_arg, clnt);
-		if (result_3 == (file_data *) NULL) {
-			clnt_perror (clnt, "call failed");
-		}z
-	} 
+		char nuevo_file_name[MAX_BUFFER];
 
-	result_4 = rfs_close_1(&rfs_close_1_arg, clnt);
-	if (result_4 == (int *) NULL) {
-		clnt_perror (clnt, "call failed");
+		printf("Elija el archivo local en el que desea volcar el contenido:\n ");
+		scanf("%s", nuevo_file_name);
+
+		// Abre el archivo local.
+		lfd = fopen(nuevo_file_name, "a");
+		rfs_write_1_arg.fd=lfd;
+		result_3 = rfs_write_1(&rfs_write_1_arg, clnt);
+		if (result_3 == (file_data *) NULL)
+			clnt_perror (clnt, "Falló llamada WRITE");
+
+		// Cierra el archivo local.
+		fclose(lfd);
 	}
 
 #ifndef	DEBUG

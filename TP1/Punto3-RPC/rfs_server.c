@@ -34,9 +34,19 @@ rfs_write_1_svc(write_record *argp, struct svc_req *rqstp)
 {
 	static file_data  result;
 
-	/*
-	 * insert server code here
-	 */
+	static ssize_t exito;
+
+	printf("Recibida una llamada write\n");
+	result.file_data_val = argp->buffer;
+
+	
+	exito = write(argp->fd, argp->buffer, argp->count);
+
+	if (exito == -1)
+		result.file_data_len = 0;
+	else
+		result.file_data_len = 1;
+	
 
 	return &result;
 }
