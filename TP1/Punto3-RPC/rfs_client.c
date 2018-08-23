@@ -8,9 +8,14 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <ctype.h>
+#include <string.h>
 
 void
-rfs_1(char *host, char *file_name)
+rfs_1(char *host, char *file_name,  int opcion)
 {
 
 	CLIENT *clnt;
@@ -43,27 +48,30 @@ rfs_1(char *host, char *file_name)
 	if (fd == -1) {
 		printf("Error al abrir el archivo\n"); return;
 	}
-	rfs_read_1_arg.fd = fd;
-	rfs_read_1_arg.count = 20;
-
-	// RFS READ
-	do {
-		result_2 = rfs_read_1(&rfs_read_1_arg, clnt);
-		if (result_2 == (file_data *) NULL) {
-			clnt_perror (clnt, "Fallo llamada read");
-		}
-		for (n=0; n < result_2->file_data_len; ++n)
-			putchar(result_2->file_data_val[n]);
-	} while (result_2->file_data_len == 20);
-	putchar('\n');
-
-
-	result_3 = rfs_write_1(&rfs_write_1_arg, clnt);
-	if (result_3 == (file_data *) NULL) {
-		clnt_perror (clnt, "call failed");
-	}
-
 	
+	if (opcion == 1)
+	{
+		// RFS READ
+		rfs_read_1_arg.fd = fd;
+		rfs_read_1_arg.count = 20;
+
+		do {
+			result_2 = rfs_read_1(&rfs_read_1_arg, clnt);
+			if (result_2 == (file_data *) NULL) {
+				clnt_perror (clnt, "Fallo llamada read");
+			}
+			for (n=0; n < result_2->file_data_len; ++n)
+				putchar(result_2->file_data_val[n]);
+		} while (result_2->file_data_len == 20);
+		putchar('\n');
+	} else {
+		// RFS WRITE
+		result_3 = rfs_write_1(&rfs_write_1_arg, clnt);
+		if (result_3 == (file_data *) NULL) {
+			clnt_perror (clnt, "call failed");
+		}
+	} 
+
 	result_4 = rfs_close_1(&rfs_close_1_arg, clnt);
 	if (result_4 == (int *) NULL) {
 		clnt_perror (clnt, "call failed");
@@ -74,20 +82,77 @@ rfs_1(char *host, char *file_name)
 #endif	 /* DEBUG */
 }
 
+int menu(int opcion, char * host)
+{
+	/* nombre del host remoto */
+	char file_name[40]; /* nombre del archivo a leer */
+	
+	if (opcion != 1 && opcion != 2)
+		return -1;
 
-int
-main (int argc, char *argv[])
+	switch (opcion)
+	{
+		case 1: 
+			printf("Ingrese nombre de archivo a leer\n");
+			break;
+		default:
+			printf("Ingrese nombre de archivo a escribir\n");
+			break;
+	}
+	while(1){
+		scanf("%s", file_name);
+        if (strlen(file_name) != 0)
+		{
+            rfs_1 (host, file_name, opcion);
+			break;
+		}
+        getchar();
+	}
+}
+
+int printMenu(char * host)
+{
+	int result, opcion = 0;
+	printf("==================\n");
+	printf("Remote File System\n");
+	printf("==================\n");
+	printf("Leer archivo: 1\n");
+	printf("Escribir archivo: 2\n");
+	printf("Salir: 3\n");
+
+	do {
+		scanf("%d", &opcion);
+	} while (opcion < 1 && opcion > 3);
+
+
+	if(opcion == 3)
+		return -1;
+	else 
+	{
+		if ((result = menu(opcion, host))< 0)
+			return -1;
+		return 0;
+	}
+
+}
+
+
+int main (int argc, char *argv[])
 {
 	char *host;
-	char *file_name;
+	int result;
 	/* Se deben pasar nombre de host y de archivo => argc=3 */
-	if (argc < 3) {
-		printf ("usage: %s server_host filename\n", argv[0]);
+	if (argc < 2) {
+		printf ("usage: %s server_host", argv[0]);
 		exit (1);
 	}
 	host = argv[1];
-	/* nombre del host remoto */
-	file_name = argv[2]; /* nombre del archivo a leer */
-	rfs_1 (host, file_name);
+
+	while(1)
+	{
+		if ((result = printMenu(host)) < 0 )
+			break;
+	}
+	
 	exit (0);
 }
