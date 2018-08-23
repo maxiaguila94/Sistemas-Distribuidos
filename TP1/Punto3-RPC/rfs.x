@@ -10,6 +10,14 @@ struct read_record
 int fd;
 int count;
 };
+
+struct write_record
+{
+int fd;
+int count;
+char buffer [256];
+};
+
 program RFS
 {
 version RFS_VERS_1

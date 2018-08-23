@@ -38,3 +38,19 @@ xdr_read_record (XDR *xdrs, read_record *objp)
 		 return FALSE;
 	return TRUE;
 }
+
+bool_t
+xdr_write_record (XDR *xdrs, write_record *objp)
+{
+	register int32_t *buf;
+
+	int i;
+	 if (!xdr_int (xdrs, &objp->fd))
+		 return FALSE;
+	 if (!xdr_int (xdrs, &objp->count))
+		 return FALSE;
+	 if (!xdr_vector (xdrs, (char *)objp->buffer, 256,
+		sizeof (char), (xdrproc_t) xdr_char))
+		 return FALSE;
+	return TRUE;
+}
