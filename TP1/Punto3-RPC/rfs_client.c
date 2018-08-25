@@ -14,6 +14,14 @@
 #include <ctype.h>
 #include <string.h>
 
+#define RED     "\x1b[31m"
+#define GREEN   "\x1b[32m"
+#define YELLOW  "\x1b[33m"
+#define BLUE    "\x1b[34m"
+#define MAGENTA "\x1b[35m"
+#define CYAN    "\x1b[36m"
+#define RESET   "\x1b[0m"
+
 void
 rfs_1(char *host, char *file_name,  int opcion)
 {
@@ -67,6 +75,7 @@ rfs_1(char *host, char *file_name,  int opcion)
 				putchar(result_2->file_data_val[n]);
 		} while (result_2->file_data_len == rfs_read_1_arg.count);
 		putchar('\n');
+		getchar();
 	} else {
 		// RFS WRITE
 		char nuevo_file_name[MAX_BUFFER];
@@ -114,19 +123,42 @@ int menu(int opcion, char * host)
             rfs_1 (host, file_name, opcion);
 			break;
 		}
-        getchar();
 	}
+    getchar();
 }
+
+int printBanner ()
+{
+ 	FILE *archivo;
+ 	char caracteres[100];
+ 	archivo = fopen("banner.txt","r");
+ 	
+ 	if (archivo == NULL)
+ 		exit(1);
+ 	else
+	{
+		while (feof(archivo) == 0)
+		{
+			fgets(caracteres,100,archivo);
+			printf( RED "%s" RESET,caracteres);
+		}
+	}
+	fclose(archivo);
+}
+
 
 int printMenu(char * host)
 {
 	int result, opcion = 0;
-	printf("==================\n");
-	printf("Remote File System\n");
-	printf("==================\n");
-	printf("Leer archivo: 1\n");
+
+	system("clear");
+	printf(GREEN "*****************************************************\n" RESET);
+	printBanner();
+	printf(GREEN "*****************************************************\n" RESET);
+	printf(BLUE "Leer archivo: 1\n");
 	printf("Escribir archivo: 2\n");
-	printf("Salir: 3\n");
+	printf("Salir: 3\n" RESET);
+	printf("\n");
 
 	do {
 		scanf("%d", &opcion);
