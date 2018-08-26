@@ -13,6 +13,7 @@
 #include <unistd.h>
 #include <ctype.h>
 #include <string.h>
+#include <errno.h>
 
 #define RED     "\x1b[31m"
 #define GREEN   "\x1b[32m"
@@ -22,24 +23,12 @@
 #define CYAN    "\x1b[36m"
 #define RESET   "\x1b[0m"
 
-void
-rfs_1(char *host, char *file_name,  int opcion)
+
+CLIENT * rfs_1(char *host)
 {
 
 	CLIENT *clnt;
-	int  *result_1;
-	open_record  rfs_open_1_arg;
-	file_data  *result_2;
-	read_record  rfs_read_1_arg;
-	int  *result_3;
-	write_record  rfs_write_1_arg;
-	int  *result_4;
-	int  rfs_close_1_arg;
-	int fd, n;
-	const int MAX_BUFFER = 1024;
-	FILE *lfd;
-
-
+		
 #ifndef	DEBUG
 	clnt = clnt_create (host, RFS, RFS_VERS_1, "udp");
 	if (clnt == NULL) {
@@ -48,109 +37,177 @@ rfs_1(char *host, char *file_name,  int opcion)
 	}
 #endif	/* DEBUG */
 
-	// RFS OPEN
-	rfs_open_1_arg.file_name = file_name; /* define archivo a leer */
-	rfs_open_1_arg.flags = O_RDWR; /* define permisos */
-	result_1 = rfs_open_1(&rfs_open_1_arg, clnt);
-	if (result_1 == (int *) NULL) {
-		clnt_perror (clnt, "Fallo llamada open");
-	}
-	fd = *result_1;
-	if (fd == -1) {
-		printf("Error al abrir el archivo\n"); return;
-	}
-	
-	if (opcion == 1)
-	{
-		// RFS READ
-		rfs_read_1_arg.fd = fd;
-		rfs_read_1_arg.count = 1024;
-
-		do {
-			result_2 = rfs_read_1(&rfs_read_1_arg, clnt);
-			if (result_2 == (file_data *) NULL) {
-				clnt_perror (clnt, "Fallo llamada read");
-			}
-			for (n=0; n < result_2->file_data_len; ++n)
-				putchar(result_2->file_data_val[n]);
-		} while (result_2->file_data_len == rfs_read_1_arg.count);
-		putchar('\n');
-		getchar();
-	} else {
-		// RFS WRITE
-		char nuevo_file_name[MAX_BUFFER];
-
-		printf("Elija el archivo local en el que desea volcar el contenido:\n ");
-		scanf("%s", nuevo_file_name);
-
-		// Abre el archivo local.
-		lfd = fopen(nuevo_file_name, "a");
-		rfs_write_1_arg.fd=lfd;
-		result_3 = rfs_write_1(&rfs_write_1_arg, clnt);
-		if (result_3 == (file_data *) NULL)
-			clnt_perror (clnt, "Falló llamada WRITE");
-
-		// Cierra el archivo local.
-		fclose(lfd);
-	}
-
-#ifndef	DEBUG
-	clnt_destroy (clnt);
-#endif	 /* DEBUG */
+	return clnt;
 }
 
-int menu(int opcion, char * host)
+// RFS OPEN WRAPPER
+int rsf_open(char * file_name, int flags, CLIENT * clnt)
 {
-	/* nombre del host remoto */
-	char file_name[40]; /* nombre del archivo a leer */
-	
-	if (opcion != 1 && opcion != 2)
-		return -1;
+	int  * result_1;
+	open_record rfs_open_1_arg;
 
-	switch (opcion)
+	rfs_open_1_arg.file_name = file_name; /* define archivo a leer */
+	rfs_open_1_arg.flags = flags; /* define permisos */
+
+	result_1 = rfs_open_1(&rfs_open_1_arg, clnt);
+	if (result_1 == (int *) NULL)
+		clnt_perror (clnt, "Fallo llamada open");
+
+	return *result_1;
+}
+
+
+// RFS READ WRAPPER
+file_data * rfs_read(int fd, CLIENT * clnt)
+{
+
+	file_data  *result_2;
+	read_record  rfs_read_1_arg;
+
+	rfs_read_1_arg.fd = fd;
+	rfs_read_1_arg.count = 1024;
+
+	result_2 = rfs_read_1(&rfs_read_1_arg, clnt);
+	if (result_2 == (file_data *) NULL)
+		clnt_perror (clnt, "Fallo llamada read");
+
+	return result_2;
+
+}
+
+// RFS WRITE WRAPPER
+int rfs_write (write_record * rfs_write_1_arg, CLIENT * clnt)
+{
+	file_data  * result_3;
+
+	result_3 = rfs_write_1(rfs_write_1_arg, clnt);
+	if (result_3 == (file_data *) NULL) 
 	{
-		case 1: 
-			printf("Ingrese nombre de archivo a leer\n");
-			break;
-		default:
-			printf("Ingrese nombre de archivo a escribir\n");
-			break;
+		clnt_perror (clnt, "call failed");
+		return -1;
 	}
+
+	return 0;
+
+}
+
+// RFS CLOSE WRAPPER
+int rfs_close(int rd, CLIENT * clnt)
+{
+	int  *result_4;
+	int  rfs_close_1_arg = rd;
+	
+	result_4 = rfs_close_1(&rfs_close_1_arg, clnt);
+	if (result_4 == (int *) NULL) 
+		clnt_perror (clnt, "call failed");
+
+	return *result_4;
+}
+
+
+void destroy(CLIENT * clnt)
+{
+	#ifndef	DEBUG
+		clnt_destroy (clnt);
+	#endif	 /* DEBUG */
+}
+
+void printBanner ()
+{
+ 	FILE * f;
+ 	char caracteres[100];
+ 	f = fopen("banner.txt","r");
+ 	
+ 	if (f == NULL)
+ 		exit(1);
+	
+	while (feof(f) == 0)
+	{
+		fgets(caracteres, 100, f);
+		printf( RED "%s" RESET, caracteres);
+	}
+	
+	fclose(f);
+}
+
+void getFileName(char * file_name)
+{
+
 	while(1){
 		scanf("%s", file_name);
-        if (strlen(file_name) != 0)
-		{
-            rfs_1 (host, file_name, opcion);
+		if (strlen(file_name) != 0)
 			break;
-		}
 	}
-    getchar();
 }
 
-int printBanner ()
+int leer(CLIENT * clnt)
 {
- 	FILE *archivo;
- 	char caracteres[100];
- 	archivo = fopen("banner.txt","r");
- 	
- 	if (archivo == NULL)
- 		exit(1);
- 	else
+	file_data * remote_file;
+	char file_name[40];
+	printf("Ingrese nombre de archivo a leer\n");
+	getFileName(file_name);
+
+	int rd, n;
+ 
+	if ((rd = rsf_open(file_name, O_RDWR, clnt))< 0)
+		return -1;
+	
+	do {
+		remote_file = rfs_read(rd, clnt);
+
+		for (n=0; n < remote_file->file_data_len; n++)
+			putchar(remote_file->file_data_val[n]);
+	} while (remote_file->file_data_len != 0);
+
+	rfs_close(rd, clnt);
+	getchar();
+	return 0;
+}
+
+int escribir(CLIENT * clnt)
+{
+	char file_name[40], remote_file_name[40];
+	FILE * fd;
+
+	printf("Ingrese nombre de archivo a escribir\n");
+	getFileName(file_name);
+
+	if ((fd = fopen(file_name, "a+"))<0)
 	{
-		while (feof(archivo) == 0)
-		{
-			fgets(caracteres,100,archivo);
-			printf( RED "%s" RESET,caracteres);
+		perror("Error al abrir archivo local");
+		return -1;
+	}
+
+	int rd;
+	printf("Ingrese el nombre del archivo remoto en el que desea volcar el contenido:\n ");
+	getFileName(remote_file_name);
+
+	if ((rd = rsf_open(remote_file_name, O_RDWR | O_CREAT | O_TRUNC, clnt))< 0)
+		return -1;
+
+	write_record  rfs_write_1_arg;
+	char buff[1024];
+
+	rfs_write_1_arg.fd = rd;
+
+	while(fgets(buff, 1024, fd) != 0) {
+		rfs_write_1_arg.buffer = buff;
+		rfs_write_1_arg.count = strlen(buff);
+		if(rfs_write(&rfs_write_1_arg, clnt) < 0) {
+			printf("Error al escribrir archivo\n");
+			return 1;
 		}
 	}
-	fclose(archivo);
+
+	fclose(fd);
+	rfs_close(rd, clnt);
+	getchar();
+	return 0;
 }
 
-
-int printMenu(char * host)
+int menu()
 {
-	int result, opcion = 0;
-
+	int opcion = 0;
 	system("clear");
 	printf(GREEN "*****************************************************\n" RESET);
 	printBanner();
@@ -164,35 +221,49 @@ int printMenu(char * host)
 		scanf("%d", &opcion);
 	} while (opcion < 1 && opcion > 3);
 
-
 	if(opcion == 3)
 		return -1;
-	else 
-	{
-		if ((result = menu(opcion, host))< 0)
-			return -1;
-		return 0;
-	}
 
+	return opcion;
 }
 
 
 int main (int argc, char *argv[])
 {
+	CLIENT *clnt;
 	char *host;
-	int result;
-	/* Se deben pasar nombre de host y de archivo => argc=3 */
-	if (argc < 2) {
+	int opcion, result;
+	/* Se deben pasar nombre de host => argc=2 */
+	if (argc < 2) 
+	{
 		printf ("usage: %s server_host", argv[0]);
 		exit (1);
 	}
+
 	host = argv[1];
+
+	if ((clnt = rfs_1(host)) < 0)
+		exit(1);
 
 	while(1)
 	{
-		if ((result = printMenu(host)) < 0 )
-			break;
+		if ((opcion = menu()) < 0 )
+			break;	
+
+		if (opcion == 1)
+		{
+			if ((result = leer(clnt))<0)
+				printf("No se pudo leer el archivo\n");
+
+			getchar();
+		} else {
+			if ((result = escribir(clnt))<0)
+				printf("No se pudo escribir el archivo\n");
+			getchar();
+		}	
 	}
 	
+	destroy(clnt);
 	exit (0);
+
 }

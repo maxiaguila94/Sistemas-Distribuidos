@@ -5,6 +5,9 @@
  */
 
 #include "rfs.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 int *
 rfs_open_1_svc(open_record *argp, struct svc_req *rqstp)
@@ -19,7 +22,6 @@ file_data *
 rfs_read_1_svc(read_record *argp, struct svc_req *rqstp)
 {
 	static file_data result;
-	int n;
 	printf("llamada read\n");
 	result.file_data_val = (char *) malloc(argp->count);
 	if (result.file_data_val == 0)
@@ -32,7 +34,7 @@ rfs_read_1_svc(read_record *argp, struct svc_req *rqstp)
 file_data *
 rfs_write_1_svc(write_record *argp, struct svc_req *rqstp)
 {
-	static file_data  result;
+	static file_data result;
 
 	static ssize_t exito;
 
