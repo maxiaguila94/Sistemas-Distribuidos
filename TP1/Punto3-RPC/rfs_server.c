@@ -8,13 +8,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 int *
 rfs_open_1_svc(open_record *argp, struct svc_req *rqstp)
 {
 	static int result;
 	printf("llamada open\n");
-	result = open(argp->file_name, argp->flags);
+	result = open(argp->file_name, argp->flags, S_IRWXU);
 	return &result;
 }
 

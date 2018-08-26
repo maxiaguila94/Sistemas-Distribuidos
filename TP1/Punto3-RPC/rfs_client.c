@@ -254,12 +254,9 @@ int main (int argc, char *argv[])
 		{
 			if ((result = leer(clnt))<0)
 				printf("No se pudo leer el archivo\n");
-
-			getchar();
 		} else {
 			if ((result = escribir(clnt))<0)
 				printf("No se pudo escribir el archivo\n");
-			getchar();
 		}	
 	}
 	
