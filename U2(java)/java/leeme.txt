@@ -1,0 +1,11 @@
+1. El Proyecto: SimpleThread, es un conjunto de ejecutables que demuestra el concepto de Hilos en Java.
+
+2. El Proyecto: udp, es un par cliente/servidor que demuestra la conexión con datagramas (no orientado a conexion).
+
+3. El Proyecto: tcp, es un par cliente/servidor que demuestra la conexión mediante streams (con conexión previa).
+
+4. El proyecto: tcpConcurrente, es un par cliente/servidor que demuestra la conexión mediante Streams admitiendo varios serviores en forma concurrente.
+
+5. Queda para demostración del alumno, generar un proyecto donde la conexión entre el servidor y varios clientes sea persistente y se demuestre que se mantienen los valores de las variables de instancia correspondientes a cada cliente con el intercambio aleatorio de mensajes entre esos clientes y el servidor, concurrentemente.
+
+RL 22/08/2012
