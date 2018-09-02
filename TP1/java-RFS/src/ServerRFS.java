@@ -1,5 +1,12 @@
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 
 public class ServerRFS {
 
@@ -9,7 +16,14 @@ public class ServerRFS {
 	}
 	
 	public int open(String file_name){
-		return 0;
+		try {
+			File arch = new File(file_name);
+			FileInputStream entrada = new FileInputStream(arch);
+			FileOutputStream salida = new FileOutputStream(arch, true);
+			return 0;
+		} catch (FileNotFoundException e) {
+			return -1;
+		}
 	}
 		
     public String read( String ruta ){
@@ -43,8 +57,25 @@ public class ServerRFS {
 	
 	
 	public void write (String file_name, String data) {
-		
+		FileWriter archivo = null;
+        try
+        {
+            archivo = new FileWriter(file_name, true); //la bandera TRUE es para que escriba al final del archivo ya existente
+            BufferedWriter bw = new BufferedWriter(archivo);
+       
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+           try {
+           // Nuevamente aprovechamos el finally para asegurarnos que se cierra el archivo.
+           archivo.close();
+           } catch (Exception e2) {
+              e2.printStackTrace();
+           }
+        }
+           
 	}
+        
 	
 	public void close(String file_name) {
 		
