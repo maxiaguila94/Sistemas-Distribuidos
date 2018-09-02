@@ -7,6 +7,10 @@ public class ServerRFS {
 	public ServerRFS() {
 		
 	}
+	
+	public int open(String file_name){
+		return 0;
+	}
 		
     public String read( String ruta ){
         FileReader fr = null;
@@ -38,12 +42,11 @@ public class ServerRFS {
     }
 	
 	
-	
-	
-	
-	
-	
 	public void write (String file_name, String data) {
+		
+	}
+	
+	public void close(String file_name) {
 		
 	}
 	
