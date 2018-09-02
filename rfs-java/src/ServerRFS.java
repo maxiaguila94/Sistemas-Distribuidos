@@ -50,7 +50,7 @@ public class ServerRFS {
         {
             archivo = new FileWriter(file_name, true); //la bandera TRUE es para que escriba al final del archivo ya existente
             BufferedWriter bw = new BufferedWriter(archivo);
-       
+            // bw para escribir
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
