@@ -4,4 +4,16 @@ un servidor con estados deben ser actualizada conforme estos varían.
 Por otro lado un servidor sin estados es aquel que no mantiene información sobre las actividades que fueron realizando. De este modo, por cada operación, el cliente debe volver a brindar los datos que son necesarios, provocando
 mayor tráfico de datos y sin tener un "historial" de las sesiones u operaciones realizadas anteriormente.
 
-2-a-2) 
+2-a-2) El servidor corresponde al tipo de servidores con estados, ya que mantiene
+información sobre los archivos abiertos. Cada vez que se desea leer o escribir un
+archivo primero se le solicita al servidor que lo abra. El servidor abre dicho archivo y
+devuelve al cliente el file descriptor del mismo para las posteriores operaciones.
+
+2-b) Para que el servidor pase de ser un servidor con estado (statefull) a uno sin estado (stateless) se deben primero incorporar las funciones atomicas de "opening" y "closing" de archivos en las funciones de lectura y escritura.
+Asi la funcion "rmread" y "rmwrite" deberan recibir todos los parametros necesarios para la apertura y cierre de archivos.
+
+A nivel Middleware, las cuatro funciones que había previamente (para open, close, send y receive)pasaron a ser solo dos, eliminando los correspondientes a apertura y cerrado en ambos stubs,
+teniendo asi que modificar las estructuras correspondientes para el uso de los punteros a función.
+
+Luego de estas modificaciones, al eliminar las operaciones de apertura y cierre de archivos, y que solo existan operaciones de lectura y escritura, tambien podrian eliminarse el pasaje de las flags, ya que
+en el momento de abrir un archivo, la funcion ya sabria que proposito tiene, pudiendo adecuar mejor los parametros enviados.
