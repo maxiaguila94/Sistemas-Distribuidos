@@ -1,5 +1,3 @@
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -7,7 +5,6 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import org.omg.CORBA.Object;
 
 public class ServerStub {
 	private static int port = 7896;
@@ -18,8 +15,7 @@ public class ServerStub {
 	public static ServerRFS server;
 	public static ObjectOutputStream salidaObj;
 	public static ObjectInputStream entradaObj;
-	
-	
+
 	public static void main(String args) {
 		
 		server = new ServerRFS();
