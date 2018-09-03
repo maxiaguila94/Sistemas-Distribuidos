@@ -1,0 +1,81 @@
+/*
+ * Main.java
+ *
+ * Created on 8 de noviembre de 2005, 23:12
+ *
+ * To change this template, choose Tools | Options and locate the template under
+ * the Source Creation and Management node. Right-click the template and choose
+ * Open. You can then make changes to the template in the Source Editor.
+ */
+
+/**
+ *
+ * @author Ricardo
+ */
+
+/*
+ * SimpleThread
+ * Un ejemplo muy simple de Hilos.
+ */
+public class SimpleThread extends Thread {
+	private int countDown = 5;
+	private static int threadCount = 0;
+	private int threadNumber = ++threadCount;
+	public SimpleThread() {
+		System.out.println("Haciendo el hilo: " + threadNumber);
+	}
+
+	public void run() {
+		while(true) {
+			System.out.println("Hilo: " + threadNumber + "(" + countDown + ")");
+			try {
+				Thread.sleep(1000);
+			} catch	(InterruptedException ie)
+				  {
+				  System.out.println(ie.getMessage());
+				  }
+			if(--countDown == 0) return;
+		}
+	}
+
+	public static void main(String[] args) {
+		for(int i = 0; i < 5; i++)
+			new SimpleThread().start();
+		System.out.println("Todos los Hilos fueron creados");
+	}	
+} 
+
+MacBookRik:SimpleThread ricardo$ java SimpleThread
+Haciendo el hilo: 1
+Haciendo el hilo: 2
+Hilo: 1(5)
+Haciendo el hilo: 3
+Hilo: 2(5)
+Haciendo el hilo: 4
+Hilo: 3(5)
+Haciendo el hilo: 5
+Hilo: 4(5)
+Todos los Hilos fueron creados
+Hilo: 5(5)
+Hilo: 1(4)
+Hilo: 2(4)
+Hilo: 3(4)
+Hilo: 4(4)
+Hilo: 5(4)
+Hilo: 1(3)
+Hilo: 3(3)
+Hilo: 2(3)
+Hilo: 4(3)
+Hilo: 5(3)
+Hilo: 1(2)
+Hilo: 3(2)
+Hilo: 2(2)
+Hilo: 5(2)
+Hilo: 4(2)
+Hilo: 1(1)
+Hilo: 2(1)
+Hilo: 5(1)
+Hilo: 3(1)
+Hilo: 4(1)
+
+
