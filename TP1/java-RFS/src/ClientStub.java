@@ -1,21 +1,22 @@
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 public class ClientStub {
-	
 	private Socket s;
-	DataInputStream entrada; 
-	DataOutputStream salida;
+	ObjectInputStream entrada; 
+	ObjectOutputStream salida;
 	
 	public String archivo_remoto;
 	
 	public ClientStub(String hostname, int port) {
 		try {			
 			s = new Socket(hostname, port);
-			entrada = new DataInputStream(s.getInputStream());
-			salida = new DataOutputStream(s.getOutputStream());
+			entrada = new ObjectInputStream(s.getInputStream());
+			salida = new ObjectOutputStream(s.getOutputStream());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -30,7 +31,7 @@ public class ClientStub {
    }
    
    public int rfs_read(String file_name) {
-
+		
 	   String comando = "read "+file_name;
 	   
 	   try {
