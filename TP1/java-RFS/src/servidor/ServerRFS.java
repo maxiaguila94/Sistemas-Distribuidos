@@ -1,3 +1,7 @@
+package servidor;
+
+import objetosremotos.*;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;

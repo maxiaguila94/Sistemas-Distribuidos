@@ -1,3 +1,6 @@
+package servidor;
+
+import objetosremotos.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -5,6 +8,8 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+
+import javax.sql.rowset.RowSetFactory;
 
 public class ServerStub {
 	private static int port = 7896;
@@ -43,28 +48,41 @@ public class ServerStub {
 				System.out.print("Esperando Mensajes ...");
 
 				// Aca los instanceof de los objetos entrantes
-				Object obj;
-
-				switch (key) {
-					case value:
-						
-						break;
+				Object obj = entradaObj.readObject();
 				
-					default:
-						break;
-				}			
-				
-				/*String request[] = entrada.readUTF().split(" ");
-				String response = " ";
+				if (obj instanceof RFSOpen){
 
+					RFSOpen archivo = (RFSOpen) obj;
 
-				
-				if (request[0].toLowerCase() == "read") {
-					response = server.read(request[1]);
+					System.out.println(
+						String.format("RFSOpen %s", archivo.file_name)
+					);
+
+				} else if (obj instanceof RFSRead) {
+
+					RFSRead archivo = (RFSRead) obj;
+
+					System.out.println(
+						String.format("RFSRead %s", archivo.data)
+					);
+
+				} else if (obj instanceof RFSWrite){
+
+					RFSWrite archivo = (RFSWrite) obj;
+					
+					System.out.println(
+						String.format("RFSWrite %s", archivo.data)
+					);
+
+				} else {
+
+					RFSClose archivo = (RFSClose) obj;
+
+					System.out.println(
+						String.format("RFSClose %s", archivo.archivo.getAbsolutePath())
+					);
+
 				}
-
-				salida.writeUTF(response);
-			*/	
 				
 			} catch (IOException e) {
 			// TODO Auto-generated catch block
