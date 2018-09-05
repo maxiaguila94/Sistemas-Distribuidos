@@ -15,17 +15,17 @@ public class ServerStub {
 		int port = 7896;
 		ServerSocket escuchandoSocket = null;
 		Socket socketCliente;
-		InputStream entrada;
-		OutputStream salida;
+		//InputStream entrada;
+		//OutputStream salida;
 		ServerRFS server;
-		ObjectOutputStream salidaObj;
-		ObjectInputStream entradaObj;
+		//ObjectOutputStream salidaObj;
+		//ObjectInputStream entradaObj;
 		
 		server = new ServerRFS();
 
 		try {
 			escuchandoSocket = new ServerSocket(port);
-			System.out.print("Escuchando Puerto: "+port);
+			System.out.println("Escuchando Puerto: "+port);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -34,53 +34,11 @@ public class ServerStub {
 		while (true) { 
 			
 			try {
-				System.out.print("Esperando Conexion ...");
+				System.out.println("Esperando Conexion ...");
 				socketCliente = escuchandoSocket.accept();
-				System.out.print("Conexion establecida :D");
+				System.out.println("Conexion establecida !");
 				
-				entrada = socketCliente.getInputStream();
-				salida = socketCliente.getOutputStream();
-				
-				entradaObj = new ObjectInputStream(entrada);
-				salidaObj = new ObjectOutputStream(salida);
-				System.out.print("Esperando Mensajes ...");
-
-				// Aca los instanceof de los objetos entrantes
-				Object obj = entradaObj.readObject();
-				
-				if (obj instanceof RFSOpen){
-
-					RFSOpen archivo = (RFSOpen) obj;
-
-					System.out.println(
-						String.format("RFSOpen %s", archivo.file_name)
-					);
-
-				} else if (obj instanceof RFSRead) {
-
-					RFSRead archivo = (RFSRead) obj;
-
-					System.out.println(
-						String.format("RFSRead %s", archivo.data)
-					);
-
-				} else if (obj instanceof RFSWrite){
-
-					RFSWrite archivo = (RFSWrite) obj;
-					
-					System.out.println(
-						String.format("RFSWrite %s", archivo.data)
-					);
-
-				} else {
-
-					RFSClose archivo = (RFSClose) obj;
-
-					System.out.println(
-						String.format("RFSClose %s", archivo.archivo.getAbsolutePath())
-					);
-
-				}
+				ConexionEntrante c = new ConexionEntrante(socketCliente, server);
 				
 			} catch (IOException e) {
 			// TODO Auto-generated catch block
