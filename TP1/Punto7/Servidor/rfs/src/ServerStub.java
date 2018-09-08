@@ -8,11 +8,10 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import javax.sql.rowset.RowSetFactory;
+import java.util.concurrent.ThreadPoolExecutor;
 
 public class ServerStub {
-	public static int maxTareas = 3;
+	public static int maxTareas = 2;
 
 	public static void main(String[] args) throws ClassNotFoundException {
 		int port = 7896;
