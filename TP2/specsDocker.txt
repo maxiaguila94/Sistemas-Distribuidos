@@ -1,0 +1,14 @@
+
+
+
+ Imagen utilizada para correr el contenedor de uno de los servidores
+
+https://hub.docker.com/_/openjdk/
+
+se corre con el comando: 
+
+docker run -it --name servidor-suma-resta -v $PWD:/usr/src/servidor-suma-resta openjdk bash
+
+
+Recordar que en wireshark aparecerá el cliente con distintas direcciones IP. En un caso con la 127.0.0.1 y en el otro con la 172.17.0.1 que es el gateway por defecto de la red en la que se encuentra el contenedor del servidor-suma-resta. Esto lo maneja el domonio de docker mediante su interfaz de red que se llama docker0 y que funciona como un bridge entre todas las redes virtuales de contenedores y el sistema operativo anfitrion. 
+
