@@ -1,3 +1,7 @@
+import java.net.MalformedURLException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
@@ -11,12 +15,18 @@ public class Cliente extends Thread {
     // Constructor
     public Cliente(String host) {
         try {
-            Registry registry = LocateRegistry.getRegistry(host);
-            this.objetoRemoto = (RemoteClock) registry.lookup("Reloj");
-        } catch (Exception e) {
-            System.err.println("Client exception: " + e.toString());
-            e.printStackTrace();
-        }
+
+            String rname = "//" + host + ":" + Registry.REGISTRY_PORT + "/RemoteClock";
+           IRemoteClock objetoRemoto = (IRemoteClock)Naming.lookup (rname);
+
+        } catch (MalformedURLException e) {
+	    e.printStackTrace();
+	    } catch (RemoteException e) {
+	    e.printStackTrace();
+	    } catch (NotBoundException e) {
+	    e.printStackTrace();
+	    }
+        
         this.ajuste = false;
         this.start();
         
