@@ -2,7 +2,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
 public class Cliente extends Thread {
-    private Clock objetoRemoto;
+    private RemoteClock objetoRemoto;
     private static int tolerancia = 300; // tolerancia de 5 minutos
     private static int granularidad = 500;
     private int delta;
@@ -12,13 +12,15 @@ public class Cliente extends Thread {
     public Cliente(String host) {
         try {
             Registry registry = LocateRegistry.getRegistry(host);
-            this.objetoRemoto = (Clock) registry.lookup("Reloj");
+            this.objetoRemoto = (RemoteClock) registry.lookup("Reloj");
         } catch (Exception e) {
             System.err.println("Client exception: " + e.toString());
             e.printStackTrace();
         }
         this.ajuste = false;
         this.start();
+        
+
     }
 
     // Setters y Getters
@@ -57,11 +59,11 @@ public class Cliente extends Thread {
 
     }
 
-    public void algoritmoCristian(Clock clock) {
+    public void algoritmoCristian(RemoteClock clock) {
 
     }
 
-    public void ajustaClock(Clock clock) {
+    public void ajustaClock(RemoteClock clock) {
 
     }
 
