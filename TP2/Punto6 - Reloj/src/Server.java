@@ -1,29 +1,31 @@
 import java.rmi.registry.Registry;
 import java.rmi.registry.LocateRegistry;
-import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
-public class Server{
+public class Server implements Clock {
+        
+    public Server() {}
 
-    public Server(String host) {
+    public long getHora() {
+        return System.currentTimeMillis(); //hora en milisegundos
+    }
+        
+    public static void main(String args[]) {
+        
         try {
-            IRemoteClock objetoRemoto = new RemoteClock();
+            Server obj = new Server();
+            Clock clock = (Clock) UnicastRemoteObject.exportObject(obj, 0);
+            
             // Liga el stub del objeto remoto en el registry
-            String rname = "//" + host + ":" + Registry.REGISTRY_PORT  + "/RemoteClock";
-            Naming.rebind (rname, objetoRemoto);
+            Registry registry = LocateRegistry.getRegistry();
+            registry.bind("Clock", clock);
             System.err.println("Servidor listo");
-
-        } catch (RemoteException e) {
-            System.out.println("Error remoto");
-
-        } catch (Exception e) {
+        } catch (RemoteException e){
+            System.out.println("Error remotox");
+        } catch (Exception e){
             System.err.println("Excepcion en el servidor: " + e.toString());
             e.printStackTrace();
         }
     }
-
-    public static void main(String[] args) {
-        new Server(args[0]);
-    }   
 }
