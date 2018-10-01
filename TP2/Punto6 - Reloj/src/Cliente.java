@@ -105,7 +105,6 @@ public class Cliente extends Thread {
                 }
                 //Funcionamiento de reloj
                 Thread.sleep(1000+this.getDelta()); //cada 1 segundo + delta, el reloj aumenta 1 segundo.
-                System.out.println(this.getDelta());
                 this.calendario.add(Calendar.SECOND, 1);
                 this.controlador.mostrarHora(this.getHora(), this.getMinutos(), this.getSegundos());
             }
