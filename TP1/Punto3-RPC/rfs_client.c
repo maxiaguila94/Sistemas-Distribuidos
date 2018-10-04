@@ -193,6 +193,7 @@ int escribir(CLIENT * clnt)
 	while(fgets(buff, 1024, fd) != 0) {
 		rfs_write_1_arg.buffer = buff;
 		rfs_write_1_arg.count = strlen(buff);
+		printf("%d",rfs_write_1_arg.count);
 		if(rfs_write(&rfs_write_1_arg, clnt) < 0) {
 			printf("Error al escribrir archivo\n");
 			return 1;

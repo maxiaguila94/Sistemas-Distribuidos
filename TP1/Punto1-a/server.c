@@ -73,7 +73,6 @@ int main(int argc, char *argv[])
     int buffer_tokens[256];
     int i=0;
     int resultado=0;
-    int cant_tokens=i;
     char response[256];
 
     bzero(buffer_tokens,256);
@@ -82,7 +81,9 @@ int main(int argc, char *argv[])
         buffer_tokens[i++]=atoi(token); // convierto el token a integer
     }
 
+
     
+    int cant_tokens=i;
     for (i=0; i<=cant_tokens; i++)
     {
         resultado=resultado + buffer_tokens[i]; // Realiza la suma de los tokens
