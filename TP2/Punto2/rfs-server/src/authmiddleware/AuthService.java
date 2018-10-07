@@ -9,7 +9,6 @@ import models.AuthModel;
 import models.UserModel;
 import remoteinterfaces.FileMetadata;
 import remoteinterfaces.IRemoteAuth;
-import remoteinterfaces.ResponseLogin;
 
 public class AuthService extends UnicastRemoteObject implements IRemoteAuth{
 	private static final long serialVersionUID = 1L;

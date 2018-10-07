@@ -12,14 +12,11 @@ import java.util.concurrent.CountDownLatch;
 
 import remoteinterfaces.FileMetadata;
 import remoteinterfaces.FileProxy;
-import remoteinterfaces.RFSCommand;
-import remoteinterfaces.ResponseLogin;
 import remoteinterfaces.IRemoteAuth;
 import remoteinterfaces.IRemoteFileSystem;
 
 public class RFSClient {
 
-	private static ClientStub stub;
 	private String user_token = null;
 	private boolean connected = false;
 //	public ArrayList<FileProxy> remote_files_opened; 
@@ -47,9 +44,8 @@ public class RFSClient {
 
 	// CONNECT	
 	public void connect(String hostname, String port) throws NumberFormatException, UnknownHostException, IOException, Exception {
-		stub = this.getStub(hostname, Integer.parseInt(port));
-		this.connected = true;
-		
+//		stub = this.getStub(hostname, Integer.parseInt(port));
+//		this.connected = true;		
 		this.authService = (IRemoteAuth)Naming.lookup("//"
 				+ hostname + ":"
 				+ Integer.parseInt(port) + "/auth");
@@ -226,12 +222,12 @@ public class RFSClient {
 	public boolean getStatus() {
 		return this.connected;
 	}
-	public ClientStub getStub(String hostname, int port) throws UnknownHostException, IOException {
-		if(stub == null) {
-			stub = new ClientStub(hostname, port);
-		}
-		return stub;
-	}
+//	public ClientStub getStub(String hostname, int port) throws UnknownHostException, IOException {
+//		if(stub == null) {
+//			stub = new ClientStub(hostname, port);
+//		}
+//		return stub;
+//	}
 	
 }
 

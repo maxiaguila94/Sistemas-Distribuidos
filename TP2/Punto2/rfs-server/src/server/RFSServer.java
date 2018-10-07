@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.DirectoryStream.Filter;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -13,10 +14,6 @@ import javax.jws.soap.SOAPBinding.Use;
 import models.UserModel;
 import remoteinterfaces.FileMetadata;
 import remoteinterfaces.FileProxy;
-import remoteinterfaces.IRFSConstants;
-import remoteinterfaces.RFSCommand;
-import remoteinterfaces.ResponseLogin;
-import remoteinterfaces.ResponseRead;
 import models.AuthModel;
 import models.FileModel;
 
@@ -25,21 +22,18 @@ public class RFSServer {
 	private UserModel user = null;
 	private FileModel fileModel = new FileModel();
 	private AuthModel _authService = new AuthModel();
-	public ArrayList<FileProxy> remote_files_opened;
+	public List<FileProxy> remote_files_opened;
 	
 	public RFSServer() {
         this.remote_files_opened = new ArrayList<FileProxy>();
     }
 	
     public FileProxy getOpenedFile(FileProxy file){
-        FileProxy result = null;
-        for (FileProxy f : this.remote_files_opened) {
-            if (f.getFile() == file.getFile()){
-                result = f;
-                break;
-            }
-        }
-        return result;        
+    	return (FileProxy) this.remote_files_opened
+    		.stream()
+    		.filter(f -> f.getFile() == file.getFile())
+    		.findFirst()
+    		.get();
     }
 
     
