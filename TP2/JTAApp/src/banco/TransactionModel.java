@@ -3,6 +3,7 @@ package banco;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Random;
 
 import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
@@ -13,12 +14,16 @@ public class TransactionModel {
 	Conexion conexion;
 	String query;
 	
-	public TransactionModel(Conexion conexion, String query, MyXid xid) {
+	public TransactionModel(Conexion conexion, String query) {
 	
-		this.xid = xid;
+		this.xid = new MyXid(
+				new Random(System.currentTimeMillis()).nextInt(100) +100,
+				new byte[]{0x01}, 
+				new byte[]{0x02});
+		
 		this.conexion = conexion;
-		this.query = query;
-	
+		this.query = query;	
+		
 	}
 	
 	public boolean prepare() throws SQLException, XAException {

@@ -42,12 +42,28 @@ public class SingleRemoteFileController implements ActionListener {
 	}
 
 	
-	public FileMetadata lookUpLocalCopy(String file_name) {
+	public FileMetadata lookUpLocalCopy(String file_name) throws Exception {
+		
+		System.out.println(file_name);
+		System.out.println("NOMBRE DE ARCHIVO");
+		System.out.println("Archivo"+file_name);
+		System.out.println(file_name);
 		String[] f = file_name.split("/");
-		FileMetadata file = new FileMetadata(f[2]);
-		if (file.getFileName() == null)
-			return null;
-		return file;
+		System.out.println("nombre de archivo");
+		System.out.println(f.length);
+		System.out.println(f[2]);
+		
+		try {
+			FileMetadata file = this.model.lookUpLocalCopy(f[2]);
+			if (file == null)
+				return null;
+			return file;
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new Exception();
+		}
+		
 	}
 	
 

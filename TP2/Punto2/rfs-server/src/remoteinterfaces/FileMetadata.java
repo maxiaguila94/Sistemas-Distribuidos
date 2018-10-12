@@ -11,6 +11,7 @@ import java.text.SimpleDateFormat;
 
 public class FileMetadata implements Serializable {
 	
+	private static final long serialVersionUID = 1L;
 	public static final int CLOSED = 0;
 	public static final int OPENED = 1;
 	
@@ -21,10 +22,9 @@ public class FileMetadata implements Serializable {
     private long size;
     private int status;
     
-    public FileMetadata(File f, String file_name) {
+    public FileMetadata(File f) {
+        this.fileName = f.getName();
         Path path = f.toPath();
-        System.out.println(path);
-        this.fileName = file_name.split("/")[2];
         try {            
             BasicFileAttributes attr = Files.readAttributes(path, BasicFileAttributes.class);
             this.creationTime = this._getAttrToString(attr.creationTime());

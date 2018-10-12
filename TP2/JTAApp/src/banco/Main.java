@@ -5,8 +5,6 @@ import java.util.Scanner;
 
 import javax.transaction.xa.XAException;
 
-import banco.MyXid;
-
 public class Main {
 	
 	static boolean confirma(String msg, Scanner scanner) {
@@ -42,9 +40,6 @@ public class Main {
 			 Banco banco1 = new Banco("172.17.0.2", "banco1", "jtatest", "jtatest");
 			 Banco banco2 = new Banco("172.17.0.2", "banco2", "jtatest", "jtatest");
 			 
-		 	 MyXid xid1 = new MyXid(101, new byte[]{0x01}, new byte[]{0x02});
-		 	 MyXid xid2 = new MyXid(102, new byte[]{0x01}, new byte[]{0x02});
-			 
 		 	 try {
 				Cuenta cuentaOrigen = banco1.getCuenta(origen);
 				
@@ -56,23 +51,25 @@ public class Main {
 					cuentaOrigen.setSaldo(cuentaOrigen.getSaldo() - importe);
 					cuentaDestino.setSaldo(cuentaDestino.getSaldo() + importe);
 					
-					if (banco1.prepareUpdateSaldo(cuentaOrigen, xid1) && banco2.prepareUpdateSaldo(cuentaDestino, xid2) ) {
-						
+					if (cuentaOrigen.update() && cuentaDestino.update()) {
 						System.out.println("Valores resultantes de la operacion");
 						System.out.println(String.format("CUENTA ORIGEN: %d, SALDO: %f", cuentaOrigen.getId(), cuentaOrigen.getSaldo()));
 						System.out.println(String.format("CUENTA DESTINO: %d, SALDO: %f", cuentaDestino.getId(), cuentaDestino.getSaldo()));
 						
 						if (confirma("Confirma la operacion? ", scanner)) {
-							banco1.commitTransaction();
-							banco2.commitTransaction();
+							cuentaOrigen.commit();
+							cuentaDestino.commit();
 							System.out.println("Se han actualizado los saldos exitosamente");
 						} else {
-							banco1.rollbackTransaction();
-							banco2.rollbackTransaction();
+							cuentaOrigen.rollback();
+							cuentaDestino.rollback();
 							System.out.println("Se ha abortado la transacción");
 
 						}
+						
+						
 					}
+					
 					banco1.closeConn(); 
 					banco2.closeConn();
 				}
@@ -81,22 +78,18 @@ public class Main {
 				
 			} catch (UnknownAccountExeption e) {
 				
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 		
 			} catch (UnknownTransactionException e) {
 				
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 				
 			} catch (SQLException e) {
 				
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			
 			} catch (XAException e) {
 				
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			
 			}			 

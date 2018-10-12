@@ -8,22 +8,23 @@ import java.rmi.RemoteException;
 
 public class Cliente {
     
-    public Cliente(String host) 
+    public Cliente() 
     {
         try
         {
-	    String rname = "//" + host + ":" + Registry.REGISTRY_PORT + "/RemoteMulDiv";
+	    String rname = "//" + "192.168.2.62" + ":" + "1099"  + "/RemoteMulDiv";
            IRemoteMulDiv objetoRemoto = 
                 (IRemoteMulDiv)Naming.lookup (rname);
 
-   	    String rname2 = "//" + "172.17.0.2" + ":" + "1099" + "/RemoteSumRes";
+   	    String rname2 = "//" + "192.168.2.80" + ":" + "1099" + "/RemoteSumRes";
         IRemoteSumRes objetoRemoto2 = 
              (IRemoteSumRes)Naming.lookup (rname2);
-           
-            System.out.println (objetoRemoto.multiplica(2,3));
-            System.out.println(objetoRemoto.divide(10, 2));
-            System.out.println(objetoRemoto2.suma(2, 10));
-            System.out.println(objetoRemoto2.resta(10, 5));
+                
+          	System.out.println(objetoRemoto.multiplica(2,3));
+          	System.out.println(objetoRemoto.divide(10, 2));
+          	System.out.println(objetoRemoto2.suma(2, 10));
+          	System.out.println(objetoRemoto2.resta(10, 5));
+            
         } catch (MalformedURLException e) {
 	    e.printStackTrace();
 	} catch (RemoteException e) {
@@ -37,7 +38,7 @@ public class Cliente {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        new Cliente(args[0]);
+        new Cliente();
     }
     
 }

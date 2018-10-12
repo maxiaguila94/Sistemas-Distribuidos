@@ -3,6 +3,7 @@ package models;
 import java.util.List;
 
 import remoteinterfaces.FileMetadata;
+import server.Config;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -20,11 +21,12 @@ public class FileModel {
 	}
 	
 	
-	public List<FileMetadata> filterByOwner(String owner) {
+	public List<FileMetadata> filterByOwner(String owner) throws Exception {
         String csvFile = this.csvFile;
         String line = "";
         String cvsSplitBy = ",";
-        String dir = "src/server/";
+        String dir = new Config().getProperties().getProperty("home_path");
+        
         List<FileMetadata> files = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
             while ((line = br.readLine()) != null) {
@@ -33,15 +35,17 @@ public class FileModel {
             	
 	                if (file[1].equals(owner)){
                 	
-                	File f = new File(dir+file[0]);
-	
+	                	File f = new File(dir+file[0]);
+	                	
 	                	BasicFileAttributes attr = Files.readAttributes(f.toPath(), BasicFileAttributes.class);         	
 	                	files.add(new FileMetadata(dir+file[0]));
+	                	
                 }
             }
             if(files.isEmpty()) {
             	return null;
             }
+            
             return files;
         } catch (IOException e) {
             e.printStackTrace();

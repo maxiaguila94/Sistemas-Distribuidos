@@ -11,6 +11,7 @@ import java.text.SimpleDateFormat;
 
 public class FileMetadata implements Serializable {
 	
+	private static final long serialVersionUID = 1L;
 	public static final int CLOSED = 0;
 	public static final int OPENED = 1;
 	
@@ -21,10 +22,9 @@ public class FileMetadata implements Serializable {
     private long size;
     private int status;
     
-    public FileMetadata(File f, String file_name) {
+    public FileMetadata(File f) {
+        this.fileName = f.getName();
         Path path = f.toPath();
-       
-        this.fileName = file_name;
         try {            
             BasicFileAttributes attr = Files.readAttributes(path, BasicFileAttributes.class);
             this.creationTime = this._getAttrToString(attr.creationTime());
@@ -38,23 +38,18 @@ public class FileMetadata implements Serializable {
     }
     
     public FileMetadata(String filename) {
-    	this.fileName = "src/controllers/"+filename;
+    	this.fileName = filename;
     	File f = new File(this.fileName);
     	Path path = f.toPath();
-    	
-    	if (f.exists()) {    		
-    		try {
-    			BasicFileAttributes attr = Files.readAttributes(path, BasicFileAttributes.class);
-    			this.creationTime = this._getAttrToString(attr.creationTime());
-    			this.lastAccessTime = this._getAttrToString(attr.lastAccessTime());
-    			this.lastModifiedTime = this._getAttrToString(attr.lastModifiedTime());
-    			this.size = attr.size();
-    		} catch (Exception e) {
-    			// TODO: handle exception
-    		}
-    	}else {
-    		this.fileName = null;
-    	} 
+    	try {
+            BasicFileAttributes attr = Files.readAttributes(path, BasicFileAttributes.class);
+            this.creationTime = this._getAttrToString(attr.creationTime());
+            this.lastAccessTime = this._getAttrToString(attr.lastAccessTime());
+            this.lastModifiedTime = this._getAttrToString(attr.lastModifiedTime());
+            this.size = attr.size();
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
     }
     
     public String getFileName() {
@@ -101,4 +96,5 @@ public class FileMetadata implements Serializable {
     private String _getAttrToString(FileTime attr) {
     	return new SimpleDateFormat("dd-MM-yyyy hh:mm:ss").format((attr.toMillis()));
     }
+    
 }

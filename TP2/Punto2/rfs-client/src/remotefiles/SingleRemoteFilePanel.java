@@ -47,7 +47,6 @@ public class SingleRemoteFilePanel extends JDialog{
 		this.controller.setView(this);
 		this.remote_file = remote_file;
 		
-	
 		setSize(900, 400);
 		
 		setLocationRelativeTo(owner);
@@ -61,7 +60,13 @@ public class SingleRemoteFilePanel extends JDialog{
 	
 	private void initialize() {
 		// TODO Auto-generated method stub
-		this.local_file = this.controller.lookUpLocalCopy(this.remote_file.getFileName());
+		try {
+			this.local_file = this.controller.lookUpLocalCopy(this.remote_file.getFileName());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			this.local_file = null;
+		}
 
 		//Panel Izquierdo
 		JPanel panel_2 = new JPanel();
