@@ -17,6 +17,7 @@ import remoteinterfaces.FileMetadata;
 import remoteinterfaces.FileProxy;
 import remoteinterfaces.IRFSConstants;
 import remoteinterfaces.IRemoteFileSystem;
+import server.Config;
 
 public class FileSystemService extends UnicastRemoteObject implements IRemoteFileSystem{
 	
@@ -34,9 +35,19 @@ public class FileSystemService extends UnicastRemoteObject implements IRemoteFil
 		this.remote_files_opened = new ArrayList<FileProxy>();
 	}
 
-	
-	@Override
-	public FileProxy open(String file_name, String user_token) throws RemoteException {
+    public FileProxy getOpenedFile(String file_id){
+		FileProxy result = null;
+
+		result = (FileProxy)this.remote_files_opened.stream()
+		 	.filter(f -> f.getFileID().equals(file_id))
+		 	.findFirst()
+		 	.get();
+        
+        return result;        
+    }
+    
+    
+	public String open(String file_name, int mode, String user_token) throws RemoteException {
 		
 		if (!this._authService.isLoggedIn(user_token))
 			throw new UserNotLoggedInException("El usuario no se encuentra registrado");
@@ -44,59 +55,50 @@ public class FileSystemService extends UnicastRemoteObject implements IRemoteFil
 		FileProxy file;
 		try {
 			
-			file = new FileProxy(file_name);
-			file.setFileId(UUID.randomUUID().toString());
+			String dir = Config.getProperties().getProperty("home_path");
+			file = new FileProxy(dir+file_name);
+			if (!file.exist() && mode != IRFSConstants.OPEN_O_CREAT) {
+				return null;
+			}
+			
+			if (!file.exist())
+				if (!this.fileModel.create(file_name, user_token))
+					throw new RemoteException("Error al abrir el archivo");
+				
 			this.remote_files_opened.add(file);
-			return file;
+			return file.getFileID();
 			
-		} catch (IOException e) {
-			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 			throw new CanNotFileOpenException("No fue posible abrir el archivo "+file_name);
+		}
+	}
+
+	@Override
+	public byte[] read(String file_id, int buffer_size) throws FileNotFoundException, IOException {
 		
-		}
+		byte[] buffer = new byte[buffer_size];
+		FileProxy openedFile = this.getOpenedFile(file_id);
+        int count = openedFile.getFileInputS().read(buffer);
+        if (count == -1)
+        	return null;
+        return buffer;
 	}
 
 	@Override
-	public int read(FileProxy file, byte[] buffer, long offset) throws RemoteException {
-
-		file.fileBufferInitialize();
-		FileInputStream is;
-		try {
-			is = new FileInputStream(file.getFile());
-			is.skip(offset);        
-			int count = is.read(file.file_buffer);
-			return count;
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			throw new RemoteException("Error leyendo el archivo "+file.getFileName());
-		}
-	}
-
-	@Override
-	public void write(FileProxy remoteFile, byte[] buffer, int count) throws RemoteException {
-		FileOutputStream out;
-		try {
-			out = new FileOutputStream(remoteFile.getFile(), true);
-			out.write(buffer);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			throw new RemoteException("Error al escribir el archivo"+remoteFile.getFileName());
-		}
-	}
-
-	@Override
-	public boolean close(FileProxy file) throws RemoteException {
+	public void write(String file_id, int count, byte[] data) throws FileNotFoundException, IOException {
 		
-		FileProxy file_to_remove = this.remote_files_opened
-			.stream()
-			.filter(f -> f.getFileId().equals(file.getFileId()))
-			.findFirst()
-			.get();
+		FileProxy openedFile = this.getOpenedFile(file_id);		
+		openedFile.getFileOutputS().write(data);
+	
+	}
 
-		return this.remote_files_opened.remove(file_to_remove);
+	@Override
+	public boolean close(String file_id) throws RemoteException {
+		
+		FileProxy file = this.getOpenedFile(file_id);
+		return this.remote_files_opened.remove(file);
 	}
 
 	
@@ -109,12 +111,8 @@ public class FileSystemService extends UnicastRemoteObject implements IRemoteFil
 		
 		try {
 			List<FileMetadata> files =  (List<FileMetadata>) this.fileModel.filterByOwner(user_token);
-			for (FileMetadata f : files) {
-				System.out.println("ARCHIVO:");
-				System.out.println(f.getFileName());
-				System.out.println(f.getCreationDate());
-			}
-			
+			if (files == null)
+				System.out.println("no encontro archivos del propietario");
 			return files;
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

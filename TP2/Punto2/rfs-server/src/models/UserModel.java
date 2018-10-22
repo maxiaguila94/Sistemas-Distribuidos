@@ -6,9 +6,11 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.UUID;
 
+import server.Config;
+
 public class UserModel {
 
-    private String csvFile = "src/models/users.csv";
+    private String csvFile;
     private String username;
     private String password;
     private String uid;
@@ -21,20 +23,25 @@ public class UserModel {
     public UserModel create () throws IOException{
     	final String NEXT_LINE = "\n" ;
     	if (!this.exists()){
-        	
-            FileWriter w = new FileWriter(this.csvFile, true);
-            StringBuilder sb = new StringBuilder();
-            this.setUID(UUID.randomUUID().toString());
-            sb.append(this.getUsername()
-            ).append(",").append(this.getPass()
-            ).append(",").append(this.getUID()
-            ).append(NEXT_LINE); 
-            
-
-            w.append(sb);
-            w.close();
-            
-            return this;
+        	try {
+        		this.csvFile = Config.getProperties().getProperty("users_file");
+        		FileWriter w = new FileWriter(this.csvFile, true);
+                StringBuilder sb = new StringBuilder();
+                this.setUID(UUID.randomUUID().toString());
+                sb.append(this.getUsername()
+                ).append(",").append(this.getPass()
+                ).append(",").append(this.getUID()
+                ).append(NEXT_LINE); 
+                
+                w.append(sb);
+                w.close();
+                
+                return this;
+        		
+        	} catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            } 
         } else {
             return null;
         }
@@ -46,7 +53,9 @@ public class UserModel {
         String line = "";
         String cvsSplitBy = ",";
     
-        try (BufferedReader br = new BufferedReader(new FileReader(this.csvFile))) {
+        try {
+        	this.csvFile = Config.getProperties().getProperty("users_file");
+        	BufferedReader br = new BufferedReader(new FileReader(this.csvFile));
             while ((line = br.readLine()) != null) {
                    
                 String[] users = line.split(cvsSplitBy);
@@ -60,7 +69,7 @@ public class UserModel {
             }
             return false;
     
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return false;
         } 

@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.rmi.Naming;
+import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +16,7 @@ import javax.xml.transform.stax.StAXSource;
 
 import remoteinterfaces.FileMetadata;
 import remoteinterfaces.FileProxy;
+import remoteinterfaces.IRFSConstants;
 import remoteinterfaces.IRFSServer;
 import remoteinterfaces.IRemoteAuth;
 import remoteinterfaces.IRemoteFileSystem;
@@ -58,7 +60,7 @@ public class RFSClient {
 		
 		this.setUserToken(user_token);			
 		this.remoteFileSystem = this.authService.getFileSystemService(this.getUserToken());		
-		this.setAvailableFiles((List<FileMetadata>)this.remoteFileSystem.getAvailableRemoteFiles(user_token));
+		
 
 	}
 	
@@ -71,7 +73,7 @@ public class RFSClient {
 		}
 		this.setUserToken(user_token);		
 		this.remoteFileSystem = this.authService.getFileSystemService(this.getUserToken());		
-		this.setAvailableFiles((List<FileMetadata>)this.remoteFileSystem.getAvailableRemoteFiles(user_token));
+//		this.setAvailableFiles((List<FileMetadata>)this.remoteFileSystem.getAvailableRemoteFiles(user_token));
 
 	}
 	
@@ -83,7 +85,7 @@ public class RFSClient {
 		
 		
 		try {
-			FileProxy remote_file = this.open(file.getName(), this.getUserToken());
+			FileProxy remote_file = this.open(file.getName(), IRFSConstants.OPEN_O_CREAT,  this.getUserToken());
 			
 			if( remote_file != null) {
 				
@@ -103,11 +105,24 @@ public class RFSClient {
 	// READ FILE FROM SERVER
 	public void readFileFromServer(FileMetadata file) {
 		try {
-			FileProxy remote_file = this.open(file.getFileName(), this.getUserToken());
+			FileProxy remote_file = this.open(file.getFileName(), IRFSConstants.OPEN  ,this.getUserToken());
 			
 			if( remote_file != null) {
 				
+				long tiempoInicio = System.currentTimeMillis();
+				System.out.println("Tiempo de inicio");
+				System.out.println(tiempoInicio);
+				
 				this.read(remote_file);
+				
+				long tiempoFinal = System.currentTimeMillis();
+				long totalTiempo = tiempoFinal - tiempoInicio;
+				System.out.println("Tiempo Final");
+				System.out.println(tiempoFinal);
+				System.out.println("Tiempo de ejecución en ms");
+				System.out.println(totalTiempo);
+				
+				
 				this.close(remote_file);
 			} else {
 				System.out.println("no se pudo abrir el archivo");
@@ -120,11 +135,13 @@ public class RFSClient {
 		}		
 	}
 	
-	public FileProxy open(String file_name, String user_token) throws ClassNotFoundException, IOException, Exception {
+	public FileProxy open(String file_name, int mode, String user_token) throws ClassNotFoundException, IOException, Exception {
 		
-		FileProxy file = this.remoteFileSystem.open(file_name, user_token);
-		if (file == null) 
-			return null;
+		String file_id = this.remoteFileSystem.open(file_name, mode, user_token);
+		String dir = Config.getProperties().getProperty("home_path");
+		FileProxy file = new FileProxy(dir+file_name);
+		file.setFileID(file_id);
+			
 		return file;
 	}
 	
@@ -133,20 +150,19 @@ public class RFSClient {
 		
 		String[] file_name = file.getFileName().split("/");
 		
-		String dir = new Config().getProperties().getProperty("home_path");
+		String dir = Config.getProperties().getProperty("home_path");
 		String path = dir+file_name[2]; 
+		
 		File f = new File(path);
 		
 		if (!f.exists())
 			f.createNewFile();
 		
-		FileOutputStream out = new FileOutputStream(f, true);
+		FileOutputStream out = new FileOutputStream(f);
 		
 		int count = 0;
-		long offset = 0;
-		while ((count = this.remoteFileSystem.read(file, buffer, offset)) !=-1) {
-			offset = offset + count;
-			out.write(buffer, 0, count);	
+		while ((buffer = this.remoteFileSystem.read(file.getFileID(), 1024)) != null) {
+			out.write(buffer);	
 		}
 		out.close();
 			
@@ -161,21 +177,23 @@ public class RFSClient {
 			FileInputStream fi = new FileInputStream(file);
 			int count = 0;
 			while ((count = fi.read(buffer)) != -1)
-				this.remoteFileSystem.write(remoteFile, buffer, count);
+				this.remoteFileSystem.write(remoteFile.getFileID(), count, buffer);
+			fi.close();
 			
 		}		
 	}
 	
 	public void close(FileProxy remote_file) throws Exception {
 		
-		if (!this.remoteFileSystem.close(remote_file)) {
+		if (!this.remoteFileSystem.close(remote_file.getFileID())) {
 			throw new Exception("no pudo cerrarse el archivo remoto");
 		}		
 		
 		
 	}
 	
-	public List<FileMetadata> getAvailableFiles(){
+	public List<FileMetadata> getAvailableFiles() throws RemoteException{
+		this.setAvailableFiles((List<FileMetadata>)this.remoteFileSystem.getAvailableRemoteFiles(this.getUserToken()));
 		return this.availableFiles;
 	}
 	
@@ -188,30 +206,22 @@ public class RFSClient {
 	}
 	
 	public void setAvailableFiles(List<FileMetadata> files) {
-		if (this.availableFiles.isEmpty()) {
-			availableFiles = new ArrayList<FileMetadata>(files);
-		}
+		
+		this.availableFiles = new ArrayList<FileMetadata>(files);
+		
 	}
 	
 	public FileMetadata lookUpLocalCopy(String file_name) throws Exception {
 				
-		String dir = new Config().getProperties().getProperty("home_path");
-		System.out.println(dir);
-		System.out.println(dir+file_name);
-		
+		String dir = Config.getProperties().getProperty("home_path");		
 		File f = new File(dir+file_name);
-		System.out.println("ARCHIVO AHORA SI");
-		System.out.println(f.getName());
-		System.out.println(f.getAbsolutePath());
 		if (!f.exists()) {
-			System.out.println("Archivo no existe");
 			return null;
 			
 		}
 		return new FileMetadata(f);
 		
 	}
-	
 	
 	public boolean getStatus() {
 		return this.connected;

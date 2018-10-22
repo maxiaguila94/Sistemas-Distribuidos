@@ -1,0 +1,37 @@
+version: '3'
+services:
+  banco1:
+    build: .
+    container_name: "jta1"
+    ports:
+      - "5433:5432"
+    command: ["--max-prepared-transactions=10"]
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=banco1
+    networks:
+      jta-net:
+        ipv4_address: 172.16.238.20
+
+  banco2:
+    build: .
+    container_name: "jta2"
+    ports:
+      - "5434:5432"
+    command: ["--max-prepared-transactions=10"]
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=banco2
+    networks:
+      jta-net:
+        ipv4_address: 172.16.238.10 
+
+networks:
+  jta-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.16.238.0/24
+        

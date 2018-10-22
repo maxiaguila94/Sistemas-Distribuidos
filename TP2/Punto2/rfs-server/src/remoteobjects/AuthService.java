@@ -8,7 +8,6 @@ import java.util.List;
 
 import models.AuthModel;
 import models.UserModel;
-import remoteinterfaces.FileMetadata;
 import remoteinterfaces.IRemoteAuth;
 import remoteinterfaces.IRemoteFileSystem;
 
@@ -16,6 +15,7 @@ public class AuthService extends UnicastRemoteObject implements IRemoteAuth{
 	private static final long serialVersionUID = 1L;
 	private AuthModel _authModel;
 	private List<UserModel> logged_users;
+	private static FileSystemService _fileSystemService;
 	
 	
 	public AuthService(AuthModel authModel) throws RemoteException {
@@ -69,7 +69,10 @@ public class AuthService extends UnicastRemoteObject implements IRemoteAuth{
 	public IRemoteFileSystem getFileSystemService(String user_token) throws RemoteException {
 		
 		if (this.isLoggedIn(user_token)) {
-			return new FileSystemService(this);
+			if(this._fileSystemService == null)
+				this._fileSystemService = new FileSystemService(this);
+			
+			return this._fileSystemService;
 		}
 		
 		return null;

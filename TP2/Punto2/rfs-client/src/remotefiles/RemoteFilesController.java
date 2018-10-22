@@ -3,6 +3,7 @@ package remotefiles;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,7 +46,7 @@ public class RemoteFilesController implements ActionListener{
 
 
 	
-	public List<FileMetadata> getAvailableFiles(){		
+	public List<FileMetadata> getAvailableFiles() throws RemoteException{		
 		return this.getModel().getAvailableFiles();
 		
 	}

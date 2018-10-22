@@ -18,6 +18,7 @@ import remoteinterfaces.FileMetadata;
 
 public class SingleRemoteFilePanel extends JDialog{
 	
+	private static final long serialVersionUID = 1L;
 	private JTextField txtRemoteFileName;
 	private JTextField txtRemoteSize;
 	private JTextField txtRemoteLastModified;

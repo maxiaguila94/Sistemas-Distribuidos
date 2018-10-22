@@ -9,23 +9,24 @@ public class Config {
 	private static Properties properties;
 	
 	public Config() throws Exception {
-		
-		if (this.properties == null) {
-			this.properties = new Properties();
+				
+	}
+	
+	public static Properties getProperties() throws Exception {
+		if (properties == null) {
+			properties = new Properties();
 			try {
 				FileInputStream is = new FileInputStream(CONF_FILE_PATH);
-				this.properties.load(is);
+				properties.load(is);
 				is.close();		
 			} catch (Exception e) {
 				e.printStackTrace();
-				this.properties = null;
+				properties = null;
 				throw new Exception("No pudo cargarse la configuración");
 				
 			}
-		}		
-	}
-	
-	public Properties getProperties() {
-		return this.properties;
+		}
+		
+		return properties;
 	}
 }

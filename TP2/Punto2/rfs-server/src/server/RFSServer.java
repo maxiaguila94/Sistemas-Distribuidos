@@ -14,6 +14,8 @@ import models.AuthModel;
 public class RFSServer extends UnicastRemoteObject implements IRFSServer{
 
 	private static final long serialVersionUID = 1L;
+	private static AuthService _authService;
+	private static AuthModel _authModel;
 	
 	protected RFSServer() throws RemoteException, MalformedURLException {
 		super();
@@ -23,8 +25,17 @@ public class RFSServer extends UnicastRemoteObject implements IRFSServer{
 
 	@Override
 	public IRemoteAuth getAuthService() throws RemoteException {
-		return new AuthService(new AuthModel());
+		if (this._authService == null)
+			this._authService = new AuthService(this.getAuthModel());
+		return this._authService;
 	}	
+	
+	private AuthModel getAuthModel() {
+		if(this._authModel == null)
+			this._authModel = new AuthModel();
+		
+		return this._authModel;
+}
 }
 
     

@@ -3,6 +3,7 @@ package remotefiles;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.ScrollPane;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +20,7 @@ public class RemoteFilesPanel extends ScrollPane{
 	RemoteFilesController controller;
 	List<FileMetadata> available_remote_files; 
 	
-	public RemoteFilesPanel(RemoteFilesController controller) {
+	public RemoteFilesPanel(RemoteFilesController controller) throws RemoteException {
 		this.controller = controller;
 		this.setAvailableRemoteFiles(this.controller.getAvailableFiles());
 
@@ -80,7 +81,7 @@ public class RemoteFilesPanel extends ScrollPane{
 		return new ImageIcon(this.getClass().getResource(iconPath));
 	}
 	
-	public void setController(RemoteFilesController controller) {
+	public void setController(RemoteFilesController controller) throws RemoteException {
 		this.controller = controller;
 		this.setAvailableRemoteFiles(this.controller.getAvailableFiles());
 	}
@@ -98,7 +99,6 @@ public class RemoteFilesPanel extends ScrollPane{
 		if(file == null)
 			return null;
 		
-		FileMetadata aux = (FileMetadata) file;
 		return (FileMetadata) file;
 		
 	}

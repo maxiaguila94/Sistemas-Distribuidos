@@ -1,6 +1,6 @@
 --DROP TABLE cuentas
 
-create role jtatest LOGIN password 'jtatest'
+CREATE ROLE jtatest LOGIN password 'jtatest';
 
 CREATE TABLE cuentas (
     id integer PRIMARY KEY, 
@@ -9,6 +9,7 @@ CREATE TABLE cuentas (
 	bloqueada boolean, 
     saldo real
 );
+
 ALTER TABLE public.cuentas OWNER TO postgres;
 GRANT SELECT,INSERT, UPDATE ON TABLE cuentas TO jtatest;
 
@@ -27,4 +28,3 @@ INSERT INTO Cuentas (id,titular,bloqueada,saldo)
   
 -- Para mirar antes y despues de correr "ejemplo1.java"
 select * from cuentas
-

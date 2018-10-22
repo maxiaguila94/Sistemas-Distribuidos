@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.rmi.RemoteException;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -106,7 +107,7 @@ public class MainController implements ActionListener{
 	}
 	
 	
-	public void showRemoteFilesPanel() {
+	public void showRemoteFilesPanel() throws RemoteException {
 		
 		this.ui.getContentPanel().removeAll();
 
