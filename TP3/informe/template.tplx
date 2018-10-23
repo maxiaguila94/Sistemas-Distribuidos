@@ -1,0 +1,11 @@
+((*- extends 'article.tplx' -*))
+
+((* block docclass *))
+\documentclass[12pt]{extarticle}
+((* endblock docclass *))
+
+
+((* block bibliography *))
+\bibliographystyle{plain}
+\bibliography{references}
+((* endblock bibliography *))
